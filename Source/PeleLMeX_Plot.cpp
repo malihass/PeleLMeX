@@ -155,7 +155,7 @@ PeleLM::WritePlotFile()
   }
 #endif
 
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
   if (m_do_extraEFdiags) {
     ncomp += NUM_IONS * AMREX_SPACEDIM;
   }
@@ -165,7 +165,7 @@ PeleLM::WritePlotFile()
     ncomp += 1;
   }
 
-  if (m_plotExtSource) {
+  if (m_plot_extSource) {
     ncomp += NVAR;
   }
 
@@ -196,7 +196,7 @@ PeleLM::WritePlotFile()
     plt_VarsName.push_back("rhoh");
     plt_VarsName.push_back("temp");
     plt_VarsName.push_back("RhoRT");
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
     plt_VarsName.push_back("nE");
     plt_VarsName.push_back("phiV");
 #endif
@@ -228,7 +228,7 @@ PeleLM::WritePlotFile()
     for (int n = 0; n < NUM_SPECIES; n++) {
       plt_VarsName.push_back("I_R(" + names[n] + ")");
     }
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
     plt_VarsName.push_back("I_R(nE)");
 #endif
     plt_VarsName.push_back("FunctCall");
@@ -270,7 +270,7 @@ PeleLM::WritePlotFile()
   }
 #endif
 
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
   if (m_do_extraEFdiags) {
     for (int ivar = 0; ivar < NUM_IONS; ++ivar) {
       for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
@@ -286,17 +286,18 @@ PeleLM::WritePlotFile()
     plt_VarsName.push_back("viscturb");
   }
 
-  if (m_plotExtSource) {
-    for (int ivar = 0; ivar < NVAR; ++ivar) {
-      plt_VarsName.push_back("extsource_" + stateVariableName(ivar));
-    }
-  }
-
 #if NUM_ODE > 0
   for (int n = 0; n < NUM_ODE; n++) {
     plt_VarsName.push_back(m_ode_names[n]);
   }
 #endif
+
+  // External source terms
+  if (m_plot_extSource) {
+    for (int ivar = 0; ivar < NVAR; ++ivar) {
+      plt_VarsName.push_back("extsource_" + stateVariableName(ivar));
+    }
+  }
 
   //----------------------------------------------------------------
   // Fill the plot MultiFabs
@@ -321,7 +322,7 @@ PeleLM::WritePlotFile()
       }
       MultiFab::Copy(mf_plt[lev], m_leveldata_new[lev]->state, RHOH, cnt, 3, 0);
       cnt += 3;
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
       MultiFab::Copy(mf_plt[lev], m_leveldata_new[lev]->state, NE, cnt, 2, 0);
       cnt += 2;
 #endif
@@ -411,17 +412,12 @@ PeleLM::WritePlotFile()
       }
     }
 #endif
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
     if (m_do_extraEFdiags) {
       MultiFab::Copy(
         mf_plt[lev], *m_ionsFluxes[lev], 0, cnt, m_ionsFluxes[lev]->nComp(), 0);
       cnt += m_ionsFluxes[lev]->nComp();
     }
-#endif
-#if NUM_ODE > 0
-    MultiFab::Copy(
-      mf_plt[lev], m_leveldata_new[lev]->state, FIRSTODE, cnt, NUM_ODE, 0);
-    cnt += NUM_ODE;
 #endif
 
     if (m_do_les && m_plot_les) {
@@ -446,12 +442,17 @@ PeleLM::WritePlotFile()
               +mut_arr_z[box_no](i, j, k) + mut_arr_z[box_no](i, j, k + 1)));
         });
       Gpu::streamSynchronize();
+      cnt += 1;
     }
-    cnt += 1;
 
-    if (m_plotExtSource) {
+#if NUM_ODE > 0
+    MultiFab::Copy(
+      mf_plt[lev], m_leveldata_new[lev]->state, FIRSTODE, cnt, NUM_ODE, 0);
+    cnt += NUM_ODE;
+#endif
+
+    if (m_plot_extSource) {
       MultiFab::Copy(mf_plt[lev], *m_extSource[lev], 0, cnt, NVAR, 0);
-      // cnt += NVAR;
     }
 
 #ifdef AMREX_USE_EB
@@ -754,7 +755,7 @@ PeleLM::ReadCheckPointFile()
 
   // Load the field data
   for (int lev = 0; lev <= finest_level; ++lev) {
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
     if (!m_restart_nonEF) {
       VisMF::Read(
         m_leveldata_new[lev]->state,
@@ -793,7 +794,7 @@ PeleLM::ReadCheckPointFile()
             lev, m_restart_chkfile, level_prefix, "divU"));
       }
 
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
       if (!m_restart_nonEF) {
         if (m_do_react) {
           VisMF::Read(
@@ -860,7 +861,7 @@ PeleLM::initLevelDataFromPlt(int a_lev, const std::string& a_dataPltFile)
   pele::physics::eos::speciesNames<pele::physics::PhysicsType::eos_type>(
     spec_names, &(eos_parms.host_parm()));
   int idT = -1, idV = -1, idY = -1, nSpecPlt = 0;
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
   int inE = -1, iPhiV = -1;
 #endif
 #ifdef PELE_USE_SOOT
@@ -888,7 +889,7 @@ PeleLM::initLevelDataFromPlt(int a_lev, const std::string& a_dataPltFile)
     if (firstChars == "Y(") {
       nSpecPlt += 1;
     }
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
     if (plt_vars[i] == "nE")
       inE = i;
     if (plt_vars[i] == "phiV")
@@ -956,7 +957,7 @@ PeleLM::initLevelDataFromPlt(int a_lev, const std::string& a_dataPltFile)
     }
   }
 
-#ifdef PELE_USE_EFIELD
+#ifdef PELE_USE_PLASMA
   // nE
   pltData.fillPatchFromPlt(a_lev, geom[a_lev], inE, NE, 1, ldata_p->state);
   // phiV
