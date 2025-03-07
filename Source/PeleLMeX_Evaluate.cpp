@@ -219,7 +219,7 @@ PeleLM::MLevaluate(
   } else if (a_var == "transportCC") {
     // Cell-centered transport coefficients functions go through the level
     // data container. Simply copy once the later has been filled.
-    // No LES component here - this is just moledular transport coeffs
+    // No LES component here - this is just molecular transport coeffs
     calcViscosity(AmrNewTime);
     calcDiffusivity(AmrNewTime);
     for (int lev = 0; lev <= finest_level; ++lev) {
