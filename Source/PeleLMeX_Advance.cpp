@@ -251,6 +251,31 @@ PeleLM::Advance(int is_initIter)
       run_time, ParallelDescriptor::IOProcessorNumber());
     amrex::Print() << " >> PeleLMeX::Advance() --> Time: " << run_time << "\n";
   }
+  
+#if 1
+  const int dump_outflow_plane = -1; // 0-2 low side, 3-5 high side
+  if (dump_outflow_plane>=0 && dump_outflow_plane<2*AMREX_SPACEDIM)
+  {
+    const int outflow_dir = dump_outflow_plane % AMREX_SPACEDIM;
+    const Orientation::Side outflow_face = dump_outflow_plane >= AMREX_SPACEDIM
+      ? Orientation::high : Orientation::low;
+    const Orientation orient(outflow_dir, outflow_face);
+    Box outflow_box = amrex::adjCell(geom[0].Domain(),orient,1);
+    outflow_box.shift(outflow_dir,outflow_face==Orientation::high ? -1 : 1);
+    FArrayBox outflow_fab(outflow_box,BL_SPACEDIM);
+    outflow_fab.setVal(0);
+    m_leveldata_new[0]->state.copyTo(outflow_fab,0,0,AMREX_SPACEDIM);
+    if (ParallelDescriptor::IOProcessor()) {
+      std::string odir = "OUTLFOW";
+      if (!FileExists(odir)) UtilCreateDirectory(odir,0755,true);
+      std::string outflow_name = odir + Concatenate("/plane_",m_nstep);      
+      std::ofstream os(outflow_name.c_str());
+      outflow_fab.writeOn(os);
+      os << m_cur_time;
+      os.close();
+    }
+  }
+#endif
 }
 
 void
