@@ -98,4 +98,4 @@ peleLM.les_cs_smag = 0.18
 peleLM.les_v = 1
 peleLM.plot_les = 1
 peleLM.plot_extSource = 1
-peleLM.les_c_chi = 2.0
+peleLM.les_c_chi = 20.0

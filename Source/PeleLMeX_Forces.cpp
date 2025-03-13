@@ -365,7 +365,7 @@ PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
                     mut_arr_z[bx](i, j, k + 1) * gz[bx](i, j, k + 1) *
                       gz[bx](i, j, k + 1)));
 
-              // extma[bx](i, j, k, FIRSTSPEC + n) += 2.0 * ScInv * mu_grad2;
+              extma[bx](i, j, k, FIRSTSPEC + n) += 2.0 * ScInv * mu_grad2;
             });
         }
       }
