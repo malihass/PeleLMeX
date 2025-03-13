@@ -828,7 +828,7 @@ public:
 
   void addSpark(const PeleLM::TimeStamp& a_time);
 
-  void addScalarDissipation(const PeleLM::TimeStamp& a_time);
+  void addScalarVarianceSources(const PeleLM::TimeStamp& a_time);
 
   //-----------------------------------------------------------------------------
 
