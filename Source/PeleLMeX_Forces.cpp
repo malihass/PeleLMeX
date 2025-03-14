@@ -241,7 +241,7 @@ PeleLM::addSpark(const TimeStamp& a_timestamp)
 void
 PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
 {
-  BL_PROFILE("PeleLM::addScalarDissipationRate");
+  BL_PROFILE("PeleLM::addScalarVarianceSources");
   // no scalar dissipation sources if not using a manifold model
 #ifndef USE_MANIFOLD_EOS
   amrex::ignore_unused(a_timestamp);
@@ -256,8 +256,8 @@ PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
   for (int n = 0; n < MANIFOLD_DIM; ++n) {
     if (leosparm.is_variance_of[n] >= 0) {
       if (!m_do_les) {
-        amrex::Abort("PeleLM::addScalarDissipation(): cannot add a "
-                     "scalarDissipation without an active LES model");
+        amrex::Abort("PeleLM::addScalarVarianceSources(): cannot add a "
+                     "scalar dissipation without an active LES model");
       }
       nvariances += 1;
       var_of_scalar = FIRSTSPEC + leosparm.is_variance_of[n];
@@ -265,15 +265,14 @@ PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
   }
 
   if (nvariances > 1) {
-    amrex::Abort("PeleLM::addScalarVariance(): currently we only support "
-                 "manifold models with 0 or 1 variances");
+    amrex::Abort(
+      "PeleLM::addScalarVarianceSources(): currently we only support "
+      "manifold models with 0 or 1 variances");
   } else if (nvariances > 0) {
 
-    //------------------------------------------------------------------------
-    // Compute scalar gradients and don't bother averaging these down
+    // Compute scalar gradients (no need to average down here)
     int do_avgDown = 0;
     auto bcRecScalar = fetchBCRecArray(var_of_scalar, 1);
-
     int nGrow = 0; // No need for ghost face on fluxes
     Vector<Array<MultiFab, AMREX_SPACEDIM>> grad_fc(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -286,13 +285,12 @@ PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
         grad_fc[lev][idim].setVal(0.0); // Required?
       }
     }
-
     getDiffusionOp()->computeGradient(
       GetVecOfArrOfPtrs(grad_fc), {},
       GetVecOfConstPtrs(getStateVect(a_timestamp)), {}, bcRecScalar[0],
       do_avgDown, var_of_scalar);
 
-    // Dissipation source term for subfilter variances
+    // Add in Production and Dissipation source terms for subfilter variances
     for (int lev = 0; lev <= finest_level; lev++) {
 
       auto* ldata_p = getLevelDataPtr(lev, a_timestamp);
@@ -349,7 +347,7 @@ PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
                 C_chi * mu_t * inv_l_scale2 *
                 statema[bx](i, j, k, FIRSTSPEC + n);
 
-              // Production term
+              // Production term (w/ Smagorinsky closure for turbulent flux)
               // -2 (rho <u_j C> - rho <u_j><C>) d<C>/dx_j
               // = 2 *mu_t/Sc_t * d<C>/dx_j * d<C>/dx_j
               amrex::Real mu_grad2 =
