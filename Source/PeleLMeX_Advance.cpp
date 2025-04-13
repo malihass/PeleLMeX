@@ -256,42 +256,40 @@ PeleLM::Advance(int is_initIter)
       run_time, ParallelDescriptor::IOProcessorNumber());
     amrex::Print() << " >> PeleLMeX::Advance() --> Time: " << run_time << "\n";
   }
-  
 }
 
 void
-PeleLM::WriteOutflowPlane(
-  int  a_step,
-  Real a_time) const
+PeleLM::WriteOutflowPlane(int a_step, Real a_time) const
 {
-  if (m_write_outflow_plane>=0 && m_write_outflow_plane<2*AMREX_SPACEDIM
-    && a_step >= 0 && a_step % m_write_outflow_plane_int == 0)
-  {
+  if (
+    m_write_outflow_plane >= 0 && m_write_outflow_plane < 2 * AMREX_SPACEDIM &&
+    a_step >= 0 && a_step % m_write_outflow_plane_int == 0) {
     const int outflow_dir = m_write_outflow_plane % AMREX_SPACEDIM;
-    const Orientation::Side outflow_face = m_write_outflow_plane >= AMREX_SPACEDIM
-      ? Orientation::high : Orientation::low;
+    const Orientation::Side outflow_face =
+      m_write_outflow_plane >= AMREX_SPACEDIM ? Orientation::high
+                                              : Orientation::low;
     const Orientation orient(outflow_dir, outflow_face);
-    
-    Box outflow_box = amrex::adjCell(geom[0].Domain(),orient,1);
-    outflow_box.shift(outflow_dir,outflow_face==Orientation::high ? -1 : 1);
-    FArrayBox outflow_fab(outflow_box,BL_SPACEDIM);    
-    outflow_fab.setVal(0);
-    m_leveldata_new[0]->state.copyTo(outflow_fab,0,0,AMREX_SPACEDIM);
 
-    std::string outflow_name = m_write_outflow_plane_dir
-      + Concatenate("/" + m_write_outflow_plane_fprefix + "_", m_nstep);      
+    Box outflow_box = amrex::adjCell(geom[0].Domain(), orient, 1);
+    outflow_box.shift(outflow_dir, outflow_face == Orientation::high ? -1 : 1);
+    FArrayBox outflow_fab(outflow_box, BL_SPACEDIM);
+    outflow_fab.setVal(0);
+    m_leveldata_new[0]->state.copyTo(outflow_fab, 0, 0, AMREX_SPACEDIM);
+
+    std::string outflow_name =
+      m_write_outflow_plane_dir +
+      Concatenate("/" + m_write_outflow_plane_fprefix + "_", m_nstep);
 
     if (m_write_outflow_plane_verbose != 0) {
       amrex::Print() << "\n Writing outflow data to " << outflow_name << "\n\n";
     }
 
     // Create dir if required, write plane data (overwrite if exists)
-    if (ParallelDescriptor::IOProcessor())
-    {
+    if (ParallelDescriptor::IOProcessor()) {
       if (!FileExists(m_write_outflow_plane_dir)) {
-	UtilCreateDirectory(m_write_outflow_plane_dir,0755,true);
+        UtilCreateDirectory(m_write_outflow_plane_dir, 0755, true);
       }
-      
+
       // Write plane as fab file, append time in file
       std::ofstream os(outflow_name.c_str());
       outflow_fab.writeOn(os);

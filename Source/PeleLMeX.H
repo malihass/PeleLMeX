@@ -990,7 +990,7 @@ public:
   void WriteDebugPlotFile(
     const amrex::Vector<const amrex::MultiFab*>& a_MF,
     const std::string& pltname);
-  void WriteOutflowPlane(int  a_step, amrex::Real a_time) const;
+  void WriteOutflowPlane(int a_step, amrex::Real a_time) const;
   //-----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------
