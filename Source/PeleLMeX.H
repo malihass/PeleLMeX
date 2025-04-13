@@ -990,6 +990,7 @@ public:
   void WriteDebugPlotFile(
     const amrex::Vector<const amrex::MultiFab*>& a_MF,
     const std::string& pltname);
+  void WriteOutflowPlane(int  a_step, amrex::Real a_time) const;
   //-----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------
@@ -1820,6 +1821,11 @@ public:
   amrex::Vector<std::string> m_evaluatePlotVars;
   bool m_write_hdf5_pltfile = false;
   bool m_do_patch_flow_variables = false;
+  int m_write_outflow_plane_verbose = true;
+  int m_write_outflow_plane = -1;
+  int m_write_outflow_plane_int = 1;
+  std::string m_write_outflow_plane_dir{"OUTFLOW"};
+  std::string m_write_outflow_plane_fprefix{"plane"};
 
   //-----------------------------------------------------------------------------
   // ALGORITHM
