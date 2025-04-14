@@ -326,6 +326,9 @@ PeleLM::initData()
     int is_restart = 1;
     activeControl(is_restart);
   }
+  //----------------------------------------------------------------
+  // Manage outflow data
+  WriteOutflowPlane(m_nstep, m_cur_time);
 }
 
 void

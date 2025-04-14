@@ -769,12 +769,12 @@ PeleLM::readParameters()
   // -----------------------------------------
   // I/O
   // -----------------------------------------
-  pp.query(
-    "write_outflow_plane",
-    m_write_outflow_plane); // 0-2 low side, 3-5 high side
-  pp.query("write_outflow_plane_int", m_write_outflow_plane_int);
   pp.query("write_outflow_plane_dir", m_write_outflow_plane_dir);
-  pp.query("write_outflow_plane_fprefix", m_write_outflow_plane_fprefix);
+  pp.query("write_outflow_plane_loc", m_write_outflow_plane_loc);
+  pp.query("write_outflow_plane_int", m_write_outflow_plane_int);
+  pp.query("write_outflow_plane_folder", m_write_outflow_plane_folder);
+  pp.query(
+    "write_outflow_plane_file_prefix", m_write_outflow_plane_file_prefix);
   pp.query("write_outflow_plane_verbose", m_write_outflow_plane_verbose);
 }
 
