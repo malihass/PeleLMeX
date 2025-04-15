@@ -1821,7 +1821,7 @@ public:
   amrex::Vector<std::string> m_evaluatePlotVars;
   bool m_write_hdf5_pltfile = false;
   bool m_do_patch_flow_variables = false;
-  int m_write_outflow_plane_verbose = true;
+  int m_write_outflow_plane_verbose = 1;
   int m_write_outflow_plane_dir = -1;
   int m_write_outflow_plane_loc = -1;
   int m_write_outflow_plane_int = 1;
