@@ -4,7 +4,7 @@
 #SBATCH --job-name=base
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=malik.hassanaly@nrel.gov
-#SBATCH --nodes=4
+#SBATCH --nodes=1
 ##SBATCH --partition=debug
 #SBATCH --ntasks-per-node=104
 
@@ -14,4 +14,5 @@
 make clean
 make realclean
 make -j
+rm -r temporals
 srun ./PeleLMeX3d.gnu.x86-spr.MPI.ex input

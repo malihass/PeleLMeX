@@ -14,7 +14,7 @@ peleLM.hi_bc = Interior NoSlipWallAdiab Interior
 
 #-------------------------AMR CONTROL----------------------------
 #amr.n_cell          = 1152 384 576      # Level 0 number of cells in each direction   
-amr.n_cell           = 384  128 192
+amr.n_cell           = 192  64 96
 #amr.n_cell           = 576  192 256
 amr.v               = 1                # AMR verbose
 amr.max_level       = 1                # maximum level number allowed
@@ -33,7 +33,8 @@ prob.meanFlowMag = 20.0
 #-------------------------PeleLM CONTROL----------------------------
 peleLM.v = 1
 peleLM.incompressible = 0
-peleLM.gradP0 = -709.79 0.0 0.0
+peleLM.do_periodic_channel = 1 
+peleLM.periodic_channel_dir = 0
 
 peleLM.do_temporals = 1
 peleLM.temporal_int = 10
@@ -47,6 +48,19 @@ amr.cfl = 0.5
 amr.derive_plot_vars = avg_pressure mag_vort
 
 peleLM.chem_integrator   = "ReactorNull"   # Chemistry integrator, from PelePhysics available list
+
+#-----------------------DIFFUSION AND LES MODEL CONTROL-----------------------
+peleLM.Prandtl = 0.7                   # [OPT, DEF=0.7] If fixed_Pr or doing LES, specifies the Prandtl number
+peleLM.Schmidt = 0.7                   # [OPT, DEF=0.7] If doing LES, specifies the Schmidt number
+
+peleLM.les_model = "Smagorinsky"              # [OPT, DEF="None"] Model to compute turbulent viscosity: None, Smagorinsky, WALE, Sigma
+peleLM.les_cs_smag = 0.18              # [OPT, DEF=0.18] If using Smagorinsky LES model, provides model coefficient
+peleLM.les_v = 0                       # [OPT, DEF=0] Verbosity level for LES model
+peleLM.plot_les = 1                    # [OPT, DEF=0] If doing LES, whether to plot the turbulent viscosity
+transport.use_soret = 0                # [OPT, DEF=0] Compute diffusion including the Soret effect (note, this option is inherited from PelePhysics)
+
+#--------------------------IO CONTROL--------------------------
+amr.plot_init_state  = true
 
 #--------------------REFINEMENT CONTROL------------------------
 #amr.refinement_indicators = temp

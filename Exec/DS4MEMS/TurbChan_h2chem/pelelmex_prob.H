@@ -60,10 +60,10 @@ struct MyProblemSpecificFunctions : public DefaultProblemSpecificFunctions
     
       // Velocity
       AMREX_D_TERM(
-        state(i, j, k, VELX) = prob_parm.meanFlowMag * std::sin(Pi * y / Ly);
-        , state(i, j, k, VELY) = 5.0 * std::sin(2 * Pi * 4 * y / Ly) *
+        state(i, j, k, VELX) = prob_parm.meanFlowMag * std::cos(Pi * y / Ly) * Pi/2;
+        , state(i, j, k, VELY) = 5.0 * std::sin(2 * Pi * 4 * y / Ly) * std::cos(Pi * y / Ly) *
                                   std::sin(2 * Pi * 11 * x / Lx);
-        , state(i, j, k, VELZ) = 5.0 * std::sin(2 * Pi * 5 * z / Lz) * std::sin(Pi *  y / Ly) *
+        , state(i, j, k, VELZ) = 5.0 * std::sin(2 * Pi * 5 * z / Lz) * std::cos(Pi *  y / Ly) *
                                   std::sin(2 * Pi * 4 * x / Lx));
     
       if (!(is_incompressible == 0)) {
