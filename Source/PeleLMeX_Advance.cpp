@@ -265,6 +265,48 @@ PeleLM::Advance(int is_initIter)
 }
 
 void
+PeleLM::WriteOutflowPlane(int a_step, Real a_time) const
+{
+  Box outflow_box = geom[0].Domain();
+
+  if (
+    m_write_outflow_plane_dir >= 0 &&
+    m_write_outflow_plane_dir <= AMREX_SPACEDIM &&
+    m_write_outflow_plane_loc >= 0 &&
+    m_write_outflow_plane_loc <=
+      outflow_box.bigEnd()[m_write_outflow_plane_dir] &&
+    a_step % m_write_outflow_plane_int == 0) {
+    outflow_box.setSmall(m_write_outflow_plane_dir, m_write_outflow_plane_loc);
+    outflow_box.setBig(m_write_outflow_plane_dir, m_write_outflow_plane_loc);
+
+    FArrayBox outflow_fab(outflow_box, BL_SPACEDIM);
+    outflow_fab.setVal<amrex::RunOn::Device>(0);
+    m_leveldata_new[0]->state.copyTo(outflow_fab, 0, 0, AMREX_SPACEDIM);
+
+    std::string outflow_name =
+      m_write_outflow_plane_folder +
+      Concatenate("/" + m_write_outflow_plane_file_prefix + "_", a_step);
+
+    if (m_write_outflow_plane_verbose != 0) {
+      amrex::Print() << "\n Writing outflow data to " << outflow_name << "\n\n";
+    }
+
+    // Create dir if required, write plane data (overwrite if exists)
+    if (ParallelDescriptor::IOProcessor()) {
+      if (!FileExists(m_write_outflow_plane_folder)) {
+        UtilCreateDirectory(m_write_outflow_plane_folder, 0755, true);
+      }
+
+      // Write plane as fab file, append time in file
+      std::ofstream os(outflow_name.c_str());
+      outflow_fab.writeOn(os);
+      os << a_time;
+      os.close();
+    }
+  }
+}
+
+void
 PeleLM::oneSDC(
   int sdcIter,
   std::unique_ptr<AdvanceAdvData>& advData,

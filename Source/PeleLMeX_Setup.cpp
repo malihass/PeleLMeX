@@ -791,6 +791,17 @@ PeleLM::readParameters()
   m_plot_extSource = false;
   pp.query("user_defined_ext_sources", m_user_defined_ext_sources);
   pp.query("plot_extSource", m_plot_extSource);
+
+  // -----------------------------------------
+  // I/O
+  // -----------------------------------------
+  pp.query("write_outflow_plane_dir", m_write_outflow_plane_dir);
+  pp.query("write_outflow_plane_loc", m_write_outflow_plane_loc);
+  pp.query("write_outflow_plane_int", m_write_outflow_plane_int);
+  pp.query("write_outflow_plane_folder", m_write_outflow_plane_folder);
+  pp.query(
+    "write_outflow_plane_file_prefix", m_write_outflow_plane_file_prefix);
+  pp.query("write_outflow_plane_verbose", m_write_outflow_plane_verbose);
 }
 
 void

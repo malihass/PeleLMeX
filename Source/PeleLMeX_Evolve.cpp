@@ -71,6 +71,9 @@ PeleLM::Evolve()
     // Diagnostics
     doDiagnostics();
 
+    // Manage outflow data
+    WriteOutflowPlane(m_nstep, m_cur_time);
+
     // Check message
     bool dump_and_stop = checkMessage("dump_and_stop");
     bool plt_and_continue = checkMessage("plt_and_continue");
