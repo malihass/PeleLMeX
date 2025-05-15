@@ -632,7 +632,7 @@ by specifying a set of filters, defining a range of interest for a variable. Not
 fine-covered regions are masked. An arbitrary number of these diagnostics may be specified in a list by setting
 ``peleLM.diagnostics`` in the input file and then specifying the diagnostic type and relevant inputs for each
 diagnostic listed. See the
-`PelePhysics  documentation <https://amrex-combustion.github.io/PelePhysics/Utility.html#diagnostics>`_ for full
+`PelePhysics Diagnostics documentation <https://amrex-combustion.github.io/PelePhysics/Utility.html#diagnostics>`_ for full
 details on the options that must be specified for each diagnostic type.
 
 ::
