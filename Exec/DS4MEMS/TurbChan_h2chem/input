@@ -43,7 +43,7 @@ peleLM.temporal_int = 10
 amr.max_step = 100000
 amr.stop_time = 2
 amr.plot_int = 1000
-amr.check_int = -1
+amr.check_int = 1000
 amr.cfl = 0.5
 amr.derive_plot_vars = avg_pressure mag_vort
 
