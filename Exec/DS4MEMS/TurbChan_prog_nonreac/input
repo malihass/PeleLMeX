@@ -1,0 +1,98 @@
+#----------------------DOMAIN DEFINITION------------------------
+# https://amrex-combustion.github.io/PeleLMeX/LMeXControls.html
+geometry.is_periodic = 1 0 1              # For each dir, 0: non-perio, 1: periodic
+geometry.coord_sys   = 0                  # 0 => cart, 1 => RZ
+geometry.prob_lo     = 0.0 -0.006 -0.018        # x_lo y_lo (z_lo)
+geometry.prob_hi     = 0.06 0.006 0.018  # x_hi y_hi (z_hi)
+
+# >>>>>>>>>>>>>  BC FLAGS <<<<<<<<<<<<<<<<
+# Interior, Inflow, Outflow, Symmetry,
+# SlipWallAdiab, NoSlipWallAdiab, SlipWallIsotherm, NoSlipWallIsotherm
+peleLM.lo_bc = Interior NoSlipWallAdiab Interior
+peleLM.hi_bc = Interior NoSlipWallAdiab Interior
+
+
+#-------------------------AMR CONTROL----------------------------
+#amr.n_cell          = 1152 384 576      # Level 0 number of cells in each direction   
+amr.n_cell           = 192  64 96
+#amr.n_cell           = 576  192 256
+amr.v               = 1                # AMR verbose
+amr.max_level       = 1                # maximum level number allowed
+amr.ref_ratio       = 2 2 2 2          # refinement ratio
+amr.regrid_int      = 1000             # how often to regrid
+amr.n_error_buf     = 2 2 2 2          # number of buffer cells in error est
+amr.grid_eff        = 0.7              # what constitutes an efficient grid
+amr.blocking_factor = 16               # block factor in grid generation (min box size)
+amr.max_grid_size   = 128               # max box size
+
+#--------------------------- Problem -------------------------------
+prob.T_mean = 750.0
+prob.P_mean = 202650.0
+prob.meanFlowMag = 20.0
+pmf.datafile = "prem_h2_phi0_55_p2_t750.dat"
+
+#-------------------------PeleLM CONTROL----------------------------
+peleLM.v = 1
+peleLM.incompressible = 0
+peleLM.do_periodic_channel = 1 
+peleLM.periodic_channel_dir = 0
+
+peleLM.do_temporals = 1
+peleLM.temporal_int = 10
+
+#amr.restart = chk30000
+amr.max_step = 100000
+amr.stop_time = 2
+amr.plot_int = 1000
+amr.check_int = 1000
+amr.cfl = 0.5
+amr.derive_plot_vars = avg_pressure mag_vort
+
+peleLM.chem_integrator   = "ReactorNull"   # Chemistry integrator, from PelePhysics available list
+
+
+#----------------------- Manifold Stuff ----------------------------
+manifold.model = Table
+manifold.v = 1
+manifold.table.v = 2
+manifold.table.filename = prem_h2_phi0_55_p2_t750.ctb
+manifold.nominal_pressure_cgs = 2026500.0
+manifold.compute_temperature = 1
+manifold.density_lookup_type = log
+peleLM.use_wbar = 0
+peleLM.chi_correction_type = DivuFirstIter
+#peleLM.chi_correction_type = NoDivu
+peleLM.print_chi_convergence = 1
+
+peleLM.deltaT_iterMax = -1
+peleLM.plot_extSource = 1
+
+#-----------------------DIFFUSION AND LES MODEL CONTROL-----------------------
+peleLM.Prandtl = 0.7                   # [OPT, DEF=0.7] If fixed_Pr or doing LES, specifies the Prandtl number
+peleLM.Schmidt = 0.7                   # [OPT, DEF=0.7] If doing LES, specifies the Schmidt number
+
+peleLM.les_model = "Smagorinsky"              # [OPT, DEF="None"] Model to compute turbulent viscosity: None, Smagorinsky, WALE, Sigma
+peleLM.les_cs_smag = 0.18              # [OPT, DEF=0.18] If using Smagorinsky LES model, provides model coefficient
+peleLM.les_v = 1                       # [OPT, DEF=0] Verbosity level for LES model
+peleLM.plot_les = 1                    # [OPT, DEF=0] If doing LES, whether to plot the turbulent viscosity
+transport.use_soret = 0                # [OPT, DEF=0] Compute diffusion including the Soret effect (note, this option is inherited from PelePhysics)
+peleLM.les_c_chi = 20.0
+
+#--------------------------IO CONTROL--------------------------
+amr.plot_init_state  = true
+
+#--------------------REFINEMENT CONTROL------------------------
+#amr.refinement_indicators = temp
+#amr.temp.max_level     = 2
+#amr.temp.value_greater = 305
+#amr.temp.field_name    = temp
+
+amr.refinement_indicators = yLow yHigh
+amr.yLow.in_box_lo = -0.001  -0.0062  -0.0185
+amr.yLow.in_box_hi =  0.061 -0.0055    0.0185
+amr.yHigh.in_box_lo = -0.001  0.0055  -0.0185
+amr.yHigh.in_box_hi =  0.061  0.0062    0.0185
+
+#amrex.fpe_trap_invalid = 1
+#amrex.fpe_trap_zero = 1
+#amrex.fpe_trap_overflow = 1
