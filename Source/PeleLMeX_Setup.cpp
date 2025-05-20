@@ -797,10 +797,10 @@ PeleLM::checkSetupParams()
   BL_PROFILE("PeleLMeX::checkSetupParams()");
   // Ensure unsupported physics is not used with manifiold models
   if (pele::physics::PhysicsType::eos_type::identifier() == "Manifold") {
-    if (m_closed_chamber != 0) {
-      amrex::Abort(
-        "Simulation with closed chamber is not yet supported for Manifold EOS");
-    }
+    //if (m_closed_chamber != 0) {
+    //  amrex::Abort(
+    //    "Simulation with closed chamber is not yet supported for Manifold EOS");
+    //}
     if (m_use_wbar != 0) {
       amrex::Abort("Use of Wbar fluxes is not compatible with Manifold EOS");
     }

@@ -21,6 +21,7 @@ struct MyProbParm : public ProbParmDefault
   amrex::Real T_mean = 750.0_rt;
   amrex::Real P_mean = 202650.0_rt;
   amrex::Real meanFlowMag = 20.0;
+  pele::physics::eos::EosParm<pele::physics::PhysicsType::eos_type> const* eosparm;
 };
 
 struct MyProblemSpecificFunctions : public DefaultProblemSpecificFunctions
@@ -50,9 +51,10 @@ struct MyProblemSpecificFunctions : public DefaultProblemSpecificFunctions
                    , const amrex::Real Ly = prob_hi[1] - prob_lo[1];
                    , const amrex::Real Lz = prob_hi[2] - prob_lo[2]);
     
-      auto eos = pele::physics::PhysicsType::eos();
+      //auto eos = pele::physics::PhysicsType::eos();
       constexpr amrex::Real Pi = 3.14159265358979323846264338327950288;
 
+      auto eos = pele::physics::PhysicsType::eos(prob_parm.eosparm);
       amrex::Real massfrac[NUM_SPECIES] = {0.0};
       state(i, j, k, TEMP) = prob_parm.T_mean;
   
