@@ -101,8 +101,9 @@ struct DefaultProblemSpecificFunctions
   {
     amrex::ignore_unused(
       x, aux_ext, idir, sgn, time, geomdata, prob_parm, pmf_data);
-    amrex::Abort("Default empty bcnormal called, please override in your "
-                 "problem specific struct !");
+    amrex::Abort(
+      "Default empty bcnormal called, please override in your "
+      "problem specific struct !");
     // For filling auxiliary variable boundary conditions
     // Retrieve nAux with aux_ext.ncomp, then aux_ext[n] = ...
   }
@@ -148,58 +149,6 @@ struct DefaultProblemSpecificFunctions
   }
 
   /**
-   * \brief Set the embedded boundary type
-   *
-   * \param x                 the EB face center coordinates.
-   * \param EBflagType        the outgoing embedded boundary type.
-   * \param EBfaceFrac        the fraction of the EB face of the above type.
-   * \param geomdata          geometry data.
-   * \param prob_parm         problem specific parameters.
-   */
-  AMREX_GPU_DEVICE
-  AMREX_FORCE_INLINE
-  static void setEBType(
-    const amrex::Real* /*xEBface[AMREX_SPACEDIM]*/,
-    int& /*EBflagType*/,
-    amrex::Real& /*EBfaceFrac*/,
-    amrex::GeometryData const& /*geomdata*/,
-    ProbParmDefault const& /*prob_parm*/)
-  {
-    /** Notes:
-     *   This function is under development and will be updated in the
-     *   near future.
-     */
-  }
-
-  /**
-   * \brief Set the embedded boundary state value
-   *
-   * \param xEBface           the EB face center coordinates.
-   * \param xEBfaceNormal     the EB face normal vector components.
-   * \param s_in              the state in the cell the face belong to.
-   * \param s_ext             outgoing state (as a standard C++ array).
-   * \param time              current time.
-   * \param geomdata          geometry data.
-   * \param prob_parm         problem specific parameters.
-   */
-  AMREX_GPU_DEVICE
-  AMREX_FORCE_INLINE
-  static void setEBState(
-    const amrex::Real* /*xEBface[AMREX_SPACEDIM]*/,
-    const amrex::Real* /*xEBfaceNormal[AMREX_SPACEDIM]*/,
-    const amrex::CellData<const amrex::Real>& /*s_in*/,
-    amrex::Real* /*s_ext[NVAR]*/,
-    const amrex::Real /*time*/,
-    amrex::GeometryData const& /*geomdata*/,
-    ProbParmDefault const& /*prob_parm*/)
-  {
-    /** Notes:
-     *   This function is under development and will be updated in the
-     *   near future.
-     */
-  }
-
-  /**
    * \brief Generate a custom Embedded Boundary geometry
    *
    * \param geom                        level at which to generate the geometry
@@ -212,8 +161,9 @@ struct DefaultProblemSpecificFunctions
     const int /*required_coarsening_level*/,
     const int /*max_coarsening_level*/)
   {
-    amrex::Abort("Default EBUserDefined function called! Redefine it in your "
-                 "local ProblemSpecificFunctions struct !");
+    amrex::Abort(
+      "Default EBUserDefined function called! Redefine it in your "
+      "local ProblemSpecificFunctions struct !");
     /** Notes:
      *   1. ParmParse any parameter for your geometry
      *   2. Construct your geometry assembling EB2::* methods

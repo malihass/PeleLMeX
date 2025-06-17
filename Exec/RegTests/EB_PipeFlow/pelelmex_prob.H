@@ -37,13 +37,15 @@ struct MyProblemSpecificFunctions : public DefaultProblemSpecificFunctions
     const amrex::Real* prob_hi = geomdata.ProbHi();
     const amrex::Real* dx = geomdata.CellSize();
 
-    AMREX_D_TERM(const amrex::Real x = prob_lo[0] + (i + 0.5) * dx[0];
-                 , const amrex::Real y = prob_lo[1] + (j + 0.5) * dx[1];
-                 , const amrex::Real z = prob_lo[2] + (k + 0.5) * dx[2];);
+    AMREX_D_TERM(
+      const amrex::Real x = prob_lo[0] + (i + 0.5) * dx[0];
+      , const amrex::Real y = prob_lo[1] + (j + 0.5) * dx[1];
+      , const amrex::Real z = prob_lo[2] + (k + 0.5) * dx[2];);
 
-    AMREX_D_TERM(const amrex::Real Lx = prob_hi[0] - prob_lo[0];
-                 , const amrex::Real Ly = prob_hi[1] - prob_lo[1];
-                 , const amrex::Real Lz = prob_hi[2] - prob_lo[2]);
+    AMREX_D_TERM(
+      const amrex::Real Lx = prob_hi[0] - prob_lo[0];
+      , const amrex::Real Ly = prob_hi[1] - prob_lo[1];
+      , const amrex::Real Lz = prob_hi[2] - prob_lo[2]);
 
     auto eos = pele::physics::PhysicsType::eos();
     constexpr amrex::Real Pi = 3.14159265358979323846264338327950288;
@@ -184,16 +186,19 @@ struct MyProblemSpecificFunctions : public DefaultProblemSpecificFunctions
     if (prob_parm.flowType == 1) {
       switch (prob_parm.meanFlowDir) {
       case 1:
-        AMREX_D_TERM(s_ext[VELX] = prob_parm.meanFlowMag;, s_ext[VELY] = 0.0;
-                     , s_ext[VELZ] = 0.0);
+        AMREX_D_TERM(
+          s_ext[VELX] = prob_parm.meanFlowMag;, s_ext[VELY] = 0.0;
+          , s_ext[VELZ] = 0.0);
         break;
       case 2:
-        AMREX_D_TERM(s_ext[VELY] = prob_parm.meanFlowMag;, s_ext[VELX] = 0.0;
-                     , s_ext[VELZ] = 0.0);
+        AMREX_D_TERM(
+          s_ext[VELY] = prob_parm.meanFlowMag;, s_ext[VELX] = 0.0;
+          , s_ext[VELZ] = 0.0);
         break;
       case 3:
-        AMREX_D_TERM(s_ext[VELZ] = prob_parm.meanFlowMag;, s_ext[VELX] = 0.0;
-                     , s_ext[VELY] = 0.0);
+        AMREX_D_TERM(
+          s_ext[VELZ] = prob_parm.meanFlowMag;, s_ext[VELX] = 0.0;
+          , s_ext[VELY] = 0.0);
         break;
       default:
         break;
@@ -218,37 +223,6 @@ struct MyProblemSpecificFunctions : public DefaultProblemSpecificFunctions
         s_ext[FIRSTSPEC + n] = massfrac[n] * s_ext[DENSITY];
       }
     }
-  }
-
-  AMREX_GPU_DEVICE
-  AMREX_FORCE_INLINE
-  static void setEBState(
-    const amrex::Real xEBface[AMREX_SPACEDIM],
-    const amrex::Real* /*xEBfaceNormal[AMREX_SPACEDIM]*/,
-    const amrex::CellData<const amrex::Real>& /*s_in*/,
-    amrex::Real s_ext[NVAR],
-    const amrex::Real /*time*/,
-    amrex::GeometryData const& /*geomdata*/,
-    MyProbParm const& /*prob_parm*/)
-  {
-    if (xEBface[1] > 0.0) {
-      s_ext[TEMP] = 800.0;
-    } else {
-      s_ext[TEMP] = 300.0;
-    }
-  }
-
-  AMREX_GPU_DEVICE
-  AMREX_FORCE_INLINE
-  static void setEBType(
-    const amrex::Real* /*xEBface[AMREX_SPACEDIM]*/,
-    int& EBflagType,
-    amrex::Real& EBfaceFrac,
-    amrex::GeometryData const& /*geomdata*/,
-    MyProbParm const& /*prob_parm*/)
-  {
-    EBflagType = 1;
-    EBfaceFrac = 1.0;
   }
 };
 
