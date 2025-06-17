@@ -452,20 +452,14 @@ PeleLM::getDiffusivity(
   // supported
   if ((addTurbContrib != 0) and m_do_les) {
 
-    // If initializing the simulation, always recompute turbulent viscosity
-    // otherwise, only recompute once per level per timestep (at old time)
-    // calcTurbViscosity computes for all levels, so only call from the base
-    // level
+    // Turbulent viscosity - always in old data except during initialization
+    // (not updated because velocity doesn't get updated until end of advance)
     TimeStamp tstamp;
     if (getTime(lev, AmrNewTime) == 0.0) {
       tstamp = AmrNewTime;
       if (lev == 0) {
         calcTurbViscosity(tstamp);
       }
-    } else if (lev == 0 and getTime(lev, AmrOldTime) > m_turb_visc_time[lev]) {
-      tstamp = AmrOldTime;
-      calcTurbViscosity(tstamp);
-      m_turb_visc_time[lev] = getTime(lev, AmrOldTime);
     } else {
       tstamp = AmrOldTime;
     }
@@ -488,8 +482,9 @@ PeleLM::getDiffusivity(
         amrex::MultiFab::Add(
           beta_ec[idim], ldata_p->lambda_turb_fc[idim], 0, 0, 1, 0);
       } else { // Invalid
-        amrex::Abort("getDiffusivity(): LES model is on but cannot provide a "
-                     "turbulent transport coefficient");
+        amrex::Abort(
+          "getDiffusivity(): LES model is on but cannot provide a "
+          "turbulent transport coefficient");
       }
     }
   }

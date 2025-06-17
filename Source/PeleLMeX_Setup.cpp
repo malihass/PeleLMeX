@@ -445,9 +445,7 @@ PeleLM::readParameters()
     m_les_verbose = m_verbose;
     pp.query("plot_les", m_plot_les);
     pp.query("les_v", m_les_verbose);
-    for (int lev = 0; lev <= max_level; ++lev) {
-      m_turb_visc_time.push_back(-1.0E200);
-    }
+    pp.query("les_c_chi", m_les_c_chi);
 #ifdef PELE_USE_PLASMA
     amrex::Abort("LES implementation is not yet compatible with plasma/ions");
 #endif
@@ -568,15 +566,15 @@ PeleLM::readParameters()
     if (mgsc_size == 1) {
       int mgsc;
       pp.query("max_grid_size_chem", mgsc);
-      AMREX_D_TERM(m_max_grid_size_chem[0] = mgsc;
-                   , m_max_grid_size_chem[1] = mgsc;
-                   , m_max_grid_size_chem[2] = mgsc);
+      AMREX_D_TERM(
+        m_max_grid_size_chem[0] = mgsc;, m_max_grid_size_chem[1] = mgsc;
+        , m_max_grid_size_chem[2] = mgsc);
     } else if (mgsc_size == AMREX_SPACEDIM) {
       Vector<int> mgsc;
       pp.getarr("max_grid_size_chem", mgsc, 0, AMREX_SPACEDIM);
-      AMREX_D_TERM(m_max_grid_size_chem[0] = mgsc[0];
-                   , m_max_grid_size_chem[1] = mgsc[1];
-                   , m_max_grid_size_chem[2] = mgsc[2]);
+      AMREX_D_TERM(
+        m_max_grid_size_chem[0] = mgsc[0];, m_max_grid_size_chem[1] = mgsc[1];
+        , m_max_grid_size_chem[2] = mgsc[2]);
     } else {
       Abort("peleLM.max_grid_size_chem should have 1 or AMREX_SPACEDIM values");
     }
@@ -635,8 +633,9 @@ PeleLM::readParameters()
     m_advection_type = "BDS";
     m_Godunov_ppm = 0;
   } else {
-    Abort("Unknown 'advection_scheme'. Recognized options are: Godunov_PLM, "
-          "Godunov_PPM or Godunov_BDS");
+    Abort(
+      "Unknown 'advection_scheme'. Recognized options are: Godunov_PLM, "
+      "Godunov_PPM or Godunov_BDS");
   }
   m_predict_advection_type =
     "Godunov"; // Only option at this point. This will disappear when
@@ -715,6 +714,10 @@ PeleLM::readParameters()
   pp.query("isothermal_EB", m_isothermalEB);
   pp.query("adv_redist_type", m_adv_redist_type);
   pp.query("diff_redist_type", m_diff_redist_type);
+  pp.query("EBinflow", m_useEBinflow);
+  if (m_isothermalEB != 0 || m_useEBinflow != 0) {
+    checkEBInflowFunctions();
+  }
 #endif
 
   // -----------------------------------------
@@ -827,9 +830,10 @@ PeleLM::checkSetupParams()
       std::abs(
         (0.1 * eos_parms.host_parm().Pnom_cgs - prob_parm->P_mean) /
         prob_parm->P_mean) > 1e-6) {
-      amrex::Abort("For Manifold EOS, pressure in manifold model "
-                   "(manifold.nominal_pressure_cgs) and pressure in PeleLMeX "
-                   "(prob.Pmean) must match");
+      amrex::Abort(
+        "For Manifold EOS, pressure in manifold model "
+        "(manifold.nominal_pressure_cgs) and pressure in PeleLMeX "
+        "(prob.Pmean) must match");
     }
 #endif
   }
@@ -943,13 +947,15 @@ PeleLM::variablesSetup()
     Print() << " First ODE: " << FIRSTODE << "\n";
     ProblemSpecificFunctions::set_ode_names(m_ode_names);
     if (m_ode_names.size() != NUM_ODE) {
-      Abort("ODEQty names improperly set. Adjust set_ode_names in "
-            "ProblemSpecificFunctions or NUM_ODE in GNUMakefile");
+      Abort(
+        "ODEQty names improperly set. Adjust set_ode_names in "
+        "ProblemSpecificFunctions or NUM_ODE in GNUMakefile");
     }
     for (int n = 0; n < NUM_ODE; ++n) {
       if (m_ode_names[n].empty()) {
-        Abort("ODEQty names improperly set. Adjust set_ode_names in "
-              "ProblemSpecificFunctions or NUM_ODE in GNUMakefile");
+        Abort(
+          "ODEQty names improperly set. Adjust set_ode_names in "
+          "ProblemSpecificFunctions or NUM_ODE in GNUMakefile");
       }
       stateComponents.emplace_back(FIRSTODE + n, m_ode_names[n]);
     }
@@ -1354,8 +1360,9 @@ PeleLM::evaluateSetup()
   {
     Vector<std::string> var_names(
       NVAR - 2); // Skip temperature and RhoRT, unused
-    AMREX_D_TERM(var_names[VELX] = "A(VELX)";, var_names[VELY] = "A(VELY)";
-                 , var_names[VELZ] = "A(VELZ)");
+    AMREX_D_TERM(
+      var_names[VELX] = "A(VELX)";, var_names[VELY] = "A(VELY)";
+      , var_names[VELZ] = "A(VELZ)");
     var_names[DENSITY] = "A(Rho)";
     for (int n = 0; n < NUM_SPECIES; n++) {
       var_names[FIRSTSPEC + n] = "A(" + spec_names[n] + ")";
@@ -1492,9 +1499,10 @@ PeleLM::taggingSetup()
       errTags.push_back(AMRErrorTag(info));
       itexists = true;
     } else {
-      Abort(std::string(
-              "Unrecognized refinement indicator for " + refinement_indicator)
-              .c_str());
+      Abort(
+        std::string(
+          "Unrecognized refinement indicator for " + refinement_indicator)
+          .c_str());
     }
 
     if (!itexists) {
