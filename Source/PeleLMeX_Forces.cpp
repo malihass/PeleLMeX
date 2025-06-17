@@ -322,6 +322,7 @@ PeleLM::addScalarVarianceSources(const TimeStamp& a_timestamp)
             auto const& gx = grad_fc[lev][0].const_arrays();
             , auto const& gy = grad_fc[lev][1].const_arrays();
             , auto const& gz = grad_fc[lev][2].const_arrays();)
+  
           auto extma = m_extSource[lev]->arrays();
           auto statema = ldata_p->state.const_arrays();
 

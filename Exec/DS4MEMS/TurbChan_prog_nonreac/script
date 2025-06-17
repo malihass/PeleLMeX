@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH --account=ds4mems
+#SBATCH --time=01:00:00
+#SBATCH --job-name=base
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=malik.hassanaly@nrel.gov
+#SBATCH --nodes=1
+##SBATCH --partition=debug
+#SBATCH --ntasks-per-node=104
+
+#make TPLclean
+#make TPLrealclean
+#make TPL -j
+#make clean
+#make realclean
+#make -j
+#rm -r temporals
+srun ./PeleLMeX3d.gnu.x86-spr.MPI.ex input
